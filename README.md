@@ -1,11 +1,8 @@
 # 🏠 House Price Predictor – An MLOps Learning Project
 
-Welcome to the **House Price Predictor** project! This is a real-world, end-to-end MLOps use case designed to help you master the art of building and operationalizing machine learning pipelines.
+Welcome to the **House Price Predictor** project. An end-to-end, real-world MLOps learning use case. The goal is to practice building and operationalizing a complete ML pipeline from raw data to deployable models.
+You’ll move through data preprocessing, feature engineering, experimentation, and model tracking with MLflow, with the option to explore interactively in Jupyter all using industry-standard tooling and workflows.
 
-You'll start from raw data and move through data preprocessing, feature engineering, experimentation, model tracking with MLflow, and optionally using Jupyter for exploration – all while applying industry-grade tooling.
-
-> 🚀 **Want to master MLOps from scratch?**  
-Check out the [MLOps Bootcamp at School of DevOps](https://schoolofdevops.com) to level up your skills.
 
 ---
 
@@ -13,7 +10,7 @@ Check out the [MLOps Bootcamp at School of DevOps](https://schoolofdevops.com) t
 
 ```
 house-price-predictor/
-├── configs/                # YAML-based configuration for models
+├── configs/                # YAML-based model and pipeline configs
 ├── data/                   # Raw and processed datasets
 ├── deployment/
 │   └── mlflow/             # Docker Compose setup for MLflow
@@ -31,7 +28,7 @@ house-price-predictor/
 
 ## 🛠️ Setting up Learning/Development Environment
 
-To begin, ensure the following tools are installed on your system:
+Install the following tools:
 
 - [Python 3.11](https://www.python.org/downloads/)
 - [Git](https://git-scm.com/)
@@ -70,7 +67,7 @@ To begin, ensure the following tools are installed on your system:
 
 ## 📊 Setup MLflow for Experiment Tracking
 
-To track experiments and model runs:
+Start MLflow locally to track experiments and model runs:
 
 ```bash
 cd deployment/mlflow
@@ -163,25 +160,9 @@ curl -X POST "http://localhost:8000/predict" \
 
 Be sure to replace `http://localhost:8000/predict` with actual endpoint based on where its running. 
 
-
-## 🧠 Learn More About MLOps
-
-This project is part of the [**MLOps Bootcamp**](https://schoolofdevops.com) at School of DevOps, where you'll learn how to:
-
-- Build and track ML pipelines
-- Containerize and deploy models
-- Automate training workflows using GitHub Actions or Argo Workflows
-- Apply DevOps principles to Machine Learning systems
-
-🔗 [Get Started with MLOps →](https://schoolofdevops.com)
-
----
-
-## 🤝 Contributing
-
-We welcome contributions, issues, and suggestions to make this project even better. Feel free to fork, explore, and raise PRs!
-
----
-
-Happy Learning!  
-— Team **School of DevOps**
+## 🎯 Key Learning Outcomes
+* Applying MLOps best practices in a structured project
+* Using MLflow to track experiments, metrics, and models
+* Packaging and deploying ML services with FastAPI + Streamlit
+* Leveraging Docker Compose for reproducible environments
+* Demonstrating how raw data becomes a production-ready ML application
