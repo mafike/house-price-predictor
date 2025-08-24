@@ -1,7 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
   labels:
     app: model
   name: model
@@ -13,7 +12,6 @@ spec:
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: model
     spec:
@@ -24,9 +22,9 @@ spec:
         - containerPort: 8000
         resources:
           requests:
-            срu: "50m"
+            cpu: "50m"
             memory: "64Mi"
           limits:
-            срu: "100m"
+            cpu: "100m"
             memory: "128Mi"
    
