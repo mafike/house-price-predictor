@@ -17,5 +17,4 @@ spec:
   selector:
     app: model
   type: NodePort
-status:
-  loadBalancer: {}
+
