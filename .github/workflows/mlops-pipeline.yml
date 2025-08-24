@@ -142,10 +142,30 @@ jobs:
         COMMIT_HASH=$(echo ${{ github.sha }} | cut -c1-7)
         docker build -t docker.io/${{ vars.DOCKERHUB_USERNAME }}/house-price-model:$COMMIT_HASH -f Dockerfile .
         docker run -d -p 8000:8000 --name test-api docker.io/${{ vars.DOCKERHUB_USERNAME }}/house-price-model:$COMMIT_HASH
-        for i in {1..10}; do
-          curl -f http://localhost:8000/health && break || sleep 5;
+        for i in {1..12}; do
+          
+          if ! docker inspect -f '{{.State.Running}}' test-api >/dev/null 2>&1; then
+            echo "Container is not running (crashed during startup)."
+            docker logs test-api
+            exit 1
+          fi
+
+          # health probe
+          if curl -fsS http://localhost:8000/health >/dev/null; then
+            ready=1
+            break
+          fi
+          sleep 5
         done
-        docker logs test-api
+
+        # timeout guard
+        if [ "${ready:-0}" -ne 1 ]; then
+          echo "Service failed to become healthy within the wait window."
+          docker logs test-api
+          exit 1
+        fi
+
+          docker logs --tail 200 test-api
 
     - name: Clean up Test Container
       run: |
