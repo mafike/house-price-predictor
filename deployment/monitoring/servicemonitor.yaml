@@ -12,7 +12,7 @@ spec:
     matchNames:
       - default     # namespace where the Service runs
   endpoints:
-  - port: http-metrics   # must match your Service's port *name*
+  - port: "8000"   # must match your Service's port *name*
     path: /metrics
     interval: 15s
 

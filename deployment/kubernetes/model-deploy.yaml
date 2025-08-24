@@ -22,5 +22,11 @@ spec:
         name: house-price-model
         ports:
         - containerPort: 8000
-        resources: {}
-status: {}
+        resources:
+          requests:
+            срu: "50m"
+            memory: "64Mi"
+          limits:
+            срu: "100m"
+            memory: "128Mi"
+   
