@@ -18,3 +18,10 @@ spec:
         query: |
           histogram_quantile(0.95,sum(rate(http_request_duration_seconds_bucket[1m])) by (le))
         threshold: "0.5"
+
+    - type: prometheus
+      metadata:
+        serverAddress: http://prom-kube-prometheus-stack-prometheus.monitoring.svc:9090
+        metricName: request_rate
+        query: sum(rate(http_requests_total[1m]))
+        threshold: "1000"
