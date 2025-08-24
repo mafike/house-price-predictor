@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: model
+  name: model
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: model
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: model
+    spec:
+      containers:
+      - image: mafike1/house-price-model:latest
+        name: house-price-model
+        ports:
+        - containerPort: 8000
+        resources: {}
+status: {}
