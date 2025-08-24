@@ -18,10 +18,7 @@ spec:
         query: |
           histogram_quantile(0.95,sum(rate(http_request_duration_seconds_bucket[1m])) by (le))
         threshold: "0.2"
-
-    - type: prometheus
+    - type: cpu
+      metricType: Utilization
       metadata:
-        serverAddress: http://prom-kube-prometheus-stack-prometheus.monitoring.svc:9090
-        metricName: request_rate
-        query: sum(rate(http_requests_total[1m]))
-        threshold: "300"
+        value: "50" # target CPU utilization percentage 
