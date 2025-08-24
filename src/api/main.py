@@ -39,6 +39,8 @@ Instrumentator().instrument(app).expose(app)
 
 def start_metrics_server():
     start_http_server(9100)
+
+threading. Thread (target=start_metrics_server, daemon=True). start ()
                        
 # Health check endpoint
 @app.get("/health", response_model=dict)
