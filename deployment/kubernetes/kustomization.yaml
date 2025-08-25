@@ -5,3 +5,4 @@ resources:
   - model-svc.yaml
   - streamlit-deploy.yaml
   - streamlit-svc.yaml
+  - fastapi-scaledobject.yaml
