@@ -17,6 +17,7 @@ spec:
     spec:
       containers:
       - image: mafike1/house-price-model:latest
+        imagePullPolicy: Always
         name: house-price-model
         ports:
         - containerPort: 8000
