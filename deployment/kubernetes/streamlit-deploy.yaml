@@ -1,7 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
   labels:
     app: streamlit
   name: streamlit
@@ -13,12 +12,12 @@ spec:
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: streamlit
     spec:
       containers:
       - image: mafike1/streamlitapp:latest
+        imagePullPolicy: Always
         name: streamlitapp
         ports:
         - containerPort: 8501
