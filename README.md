@@ -5,6 +5,8 @@ You’ll move through data preprocessing, feature engineering, experimentation, 
 
 
 ---
+
+```mermaid
 sequenceDiagram
   autonumber
   participant U as User (Browser)
@@ -18,7 +20,9 @@ sequenceDiagram
   M-->>FA: y_hat (price)
   FA-->>ST: 200 OK (prediction JSON)
   ST-->>U: Render predicted price & charts
+```
 
+```mermaid
 flowchart LR
   subgraph Repo["GitHub Repository"]
     code[Repo: code + configs]
@@ -87,7 +91,7 @@ flowchart LR
   faS --> model
   model --> faS
   faS --> ui
-
+```
 
 ## 📦 Project Structure
 
