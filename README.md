@@ -5,23 +5,153 @@ You’ll move through data preprocessing, feature engineering, experimentation, 
 
 
 ---
+sequenceDiagram
+  autonumber
+  participant U as User (Browser)
+  participant ST as Streamlit UI
+  participant FA as FastAPI (Model Service)
+  participant M as Model + Preprocessor
+
+  U->>ST: Enter features, click "Predict"
+  ST->>FA: POST /predict (JSON)
+  FA->>M: transform(features) + predict()
+  M-->>FA: y_hat (price)
+  FA-->>ST: 200 OK (prediction JSON)
+  ST-->>U: Render predicted price & charts
+
+flowchart LR
+  subgraph Repo["GitHub Repository"]
+    code[Repo: code + configs]
+  end
+
+  subgraph CI["GitHub Actions: MLOps Pipeline"]
+    dp[data-processing]
+    mt[model-training]
+    bp[build-and-publish]
+  end
+
+  subgraph Registry["DockerHub Registry"]
+    image[Image: house-price-model]
+  end
+
+  subgraph CD["Argo CD (GitOps)"]
+    manifests[Manifests in repo]
+    argo[Argo CD Application]
+  end
+
+  subgraph Cluster["Kubernetes Cluster"]
+    subgraph AppNS["Namespace: app"]
+      faD[Deployment: fastapi]
+      faS[Service: fastapi]
+      keda[KEDA ScaledObject]
+      stD[Deployment: streamlit]
+      stS[Service: streamlit]
+      ing[Ingress or LoadBalancer]
+      model[Model + Preprocessor]
+    end
+    subgraph MonNS["Namespace: monitoring"]
+      sm[ServiceMonitor: fastapi]
+      prom[Prometheus]
+      graf[Grafana]
+    end
+  end
+
+  code --> dp
+  dp --> mt
+  mt --> bp
+  bp --> image
+
+  code -. watches .- manifests
+  manifests --> argo
+  argo --> faD
+
+  image --> faD
+
+  faD --> faS
+  stD --> stS
+  faS --> ing
+  stS --> ing
+  keda -. scales .- faD
+
+  sm --> prom
+  prom --> graf
+  faS -. metrics .- sm
+
+  user[User]
+  curlClient[curl or SDK]
+  ui[Streamlit App]
+
+  user --> ui
+  ui --> faS
+  curlClient --> faS
+  faS --> model
+  model --> faS
+  faS --> ui
+
 
 ## 📦 Project Structure
 
 ```
 house-price-predictor/
-├── configs/                # YAML-based model and pipeline configs
-├── data/                   # Raw and processed datasets
-├── deployment/
-│   └── mlflow/             # Docker Compose setup for MLflow
-├── models/                 # Trained models and preprocessors
-├── notebooks/              # Optional Jupyter notebooks for experimentation
-├── src/
-│   ├── data/               # Data cleaning and preprocessing scripts
-│   ├── features/           # Feature engineering pipeline
-│   ├── models/             # Model training and evaluation
-├── requirements.txt        # Python dependencies
-└── README.md               # You’re here!
+├── configs
+│ └── model_config.yaml        # YAML configuration for model training (hyperparameters, paths, etc.)
+├── data
+│ ├── processed                # Cleaned & feature-ready datasets
+│ │ ├── cleaned_house_data.csv    # Preprocessed raw dataset
+│ │ ├── data_scientists_features.csv     # Custom feature set for experimentation
+│ │ ├── featured_house_data.csv   # Final dataset with engineered features
+│ │ └── README.md              # Notes on processed datasets
+│ └── raw
+│ └── house_data.csv           # Original raw housing dataset
+├── deployment
+│ ├── kubernetes               # K8s manifests for deploying API + Streamlit
+│ │ ├── fastapi-scaledobject.yaml # KEDA autoscaling for FastAPI
+│ │ ├── kustomization.yaml     # Kustomize entrypoint for managing manifests
+│ │ ├── model-deploy.yaml      # Model (FastAPI) Deployment
+│ │ ├── model-svc.yaml         # Service exposing FastAPI
+│ │ ├── README.md # Deployment usage notes
+│ │ ├── streamlit-deploy.yaml  # Streamlit Deployment
+│ │ └── streamlit-svc.yaml     # Service exposing Streamlit UI
+│ ├── mlflow
+│ │ └── docker-compose.yaml    # Local MLflow + backend store setup
+│ └── monitoring
+│ ├── graph-dashb.json # Grafana/Prometheus dashboard config
+│ ├── load_test.sh     # Script for load-testing API endpoints
+│ ├── predict.json     # Sample prediction payload for testing
+│ └── servicemonitor.yaml      # Prometheus ServiceMonitor for metrics scraping
+├── Dockerfile         # Root Dockerfile for FastAPI inference service
+├── LICENSE            # License for open-source usage
+├── models
+│ └── trained          # Stored model artifacts
+│ ├── house_price_model.pkl         # Trained regression model
+│ ├── preprocessor.pkl # Data preprocessing pipeline
+│ └── README.md # Documentation of trained models
+├── notebooks          # Jupyter notebooks for exploration & experimentation
+│ ├── 00_data_engineering.ipynb           # Data ingestion & cleaning
+│ ├── 01_exploratory_data_analysis.ipynb  # Exploratory Data Analysis (EDA)
+│ ├── 02_feature_engineering.ipynb  # Feature selection & engineering
+│ └── 03_experimentation.ipynb      # Model experimentation & MLflow tracking
+├── README.md          # Project documentation (you’re here)
+├── requirements.txt   # Python dependencies
+├── src
+│ ├── api              # FastAPI inference service
+│ │ ├── inference.py   # Model inference logic
+│ │ ├── main.py        # FastAPI entrypoint
+│ │ ├── README.md      # API documentation
+│ │ ├── requirements.txt      # API-specific dependencies
+│ │ ├── schemas.py     # Pydantic schemas for request/response validation
+│ │ └── utils.py       # Helper utilities for API
+│ ├── data
+│ │ └── run_processing.py     # Data preprocessing script
+│ ├── features
+│ │ └── engineer.py    # Feature engineering script
+│ └── models
+│ └── train_model.py   # Model training & evaluation script
+└── streamlit_app      # Streamlit UI for user interaction
+├── app.py             # Streamlit app entrypoint
+├── Dockerfile         # Container definition for Streamlit
+├── README.md          # Streamlit app documentation
+└── requirements.txt   # Streamlit dependencies
 ```
 
 ---
@@ -45,8 +175,7 @@ Install the following tools:
 2. **Clone your forked copy:**
 
    ```bash
-   # Replace xxxxxx with your GitHub username or org
-   git clone https://github.com/xxxxxx/house-price-predictor.git
+   git clone https://github.com/mafike/house-price-predictor.git
    cd house-price-predictor
    ```
 
