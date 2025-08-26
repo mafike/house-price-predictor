@@ -5,7 +5,7 @@ You’ll move through data preprocessing, feature engineering, experimentation, 
 
 
 ---
-
+## Sequence (request/response path):
 ```mermaid
 sequenceDiagram
   autonumber
@@ -21,7 +21,9 @@ sequenceDiagram
   FA-->>ST: 200 OK (prediction JSON)
   ST-->>U: Render predicted price & charts
 ```
+---
 
+## Flowchart (CI → Image → Argo CD → Kubernetes runtime):
 ```mermaid
 flowchart LR
   subgraph Repo["GitHub Repository"]
@@ -92,6 +94,36 @@ flowchart LR
   model --> faS
   faS --> ui
 ```
+---
+
+## 📸 Live Screenshots
+
+> From a real deployment (Argo CD ↔︎ Kubernetes). Click any image to view full size.
+
+### Grafana — API Observability
+<p align="center">
+  <a href="docs/assets/grafana-observability.png">
+    <img src="docs/assets/grafana-observability.png" alt="Grafana dashboard showing request rate per endpoint, 95th percentile latency, error rate, and request size for /health and /predict" width="850">
+  </a>
+</p>
+<sub>Dash panels include Request Rate (per endpoint), p95 Latency, Error Rate, and Request Size. Useful for SLIs/SLOs and autoscaling signals.</sub>
+
+### Argo CD — Application Topology
+<p align="center">
+  <a href="docs/assets/argocd-app-tree.png">
+    <img src="docs/assets/argocd-app-tree.png" alt="Argo CD application tree showing Deployments, Services, HPA/ScaledObject, and Pods for model (FastAPI) and Streamlit" width="850">
+  </a>
+</p>
+<sub>GitOps view of the app: FastAPI (model), Streamlit UI, KEDA ScaledObject, Services, and ReplicaSets/Pods. Health and sync status shown.</sub>
+
+### Streamlit — Prediction UI
+<p align="center">
+  <a href="docs/assets/streamlit-ui.png">
+    <img src="docs/assets/streamlit-ui.png" alt="Streamlit interface with inputs (sqft, bedrooms, bathrooms, location, year built) and prediction results panel" width="850">
+  </a>
+</p>
+<sub>Frontend for manual testing and demos. Calls FastAPI at <code>/predict</code> and renders price, confidence, range, and top factors.</sub>
+
 
 ## 📦 Project Structure
 
