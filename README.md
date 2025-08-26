@@ -3,7 +3,29 @@
 Welcome to the **House Price Predictor** project. An end-to-end, real-world MLOps learning use case. The goal is to practice building and operationalizing a complete ML pipeline from raw data to deployable models.
 You’ll move through data preprocessing, feature engineering, experimentation, and model tracking with MLflow, with the option to explore interactively in Jupyter all using industry-standard tooling and workflows.
 
+---
+## 🧰 Tech Stack & Tools
 
+- **Language & Runtime:** Python 3.11, UV (env/packaging)
+- **Modeling:** scikit-learn / XGBoost (interchangeable via `configs/model_config.yaml`)
+- **Tracking:** MLflow (local Docker in CI; UI on :5555 locally)
+- **API:** FastAPI + Uvicorn (pydantic validation, OpenAPI at `/docs`)
+- **UI:** Streamlit (talks to FastAPI via `API_URL`)
+- **Containers:** Docker (or Podman), Docker Compose
+- **Orchestration:** Kubernetes (manifests in `deployment/kubernetes/`), Kustomize
+- **GitOps:** Argo CD (watches the manifests branch)
+- **Autoscaling:** KEDA ScaledObject (Prometheus/other trigger → HPA)
+- **Observability:** Prometheus Operator (ServiceMonitor), Grafana dashboards
+- **CI/CD:** GitHub Actions → build/test → DockerHub
+
+## 🧪 Model Card (Summary)
+
+- **Intended Use:** Educational regression model for single-property price estimation demo.
+- **Training Data:** `data/raw/house_data.csv` → cleaned + engineered features in `data/processed/`.
+- **Algorithm:** (e.g.) XGBoost / RandomForest (select via `configs/model_config.yaml`).
+- **Metrics:** RMSE, MAE, R² on hold-out split; tracked in MLflow (run URL in UI).
+- **Limitations:** Not suitable for real-world appraisal; dataset bias; no macroeconomic factors.
+- **Ethical Considerations:** Avoid use in lending/underwriting decisions; explain predictions as demo only.
 ---
 ## Sequence (request/response path):
 ```mermaid
@@ -98,15 +120,16 @@ flowchart LR
 
 ## 📸 Live Screenshots
 
-> From a real deployment (Argo CD ↔︎ Kubernetes). Click any image to view full size.
-
-### Grafana — API Observability
+> From a real deployment (Github Actions ↔︎ Argo CD ↔︎ Kubernetes). Click any image to view full size.
+### GitHub Actions — MLOps Pipeline Run
 <p align="center">
-  <a href="docs/assets/grafana-observability.png">
-    <img src="docs/assets/grafana-observability.png" alt="Grafana dashboard showing request rate per endpoint, 95th percentile latency, error rate, and request size for /health and /predict" width="850">
+  <a href="docs/assets/gh-actions-run.png">
+    <img src="docs/assets/gh-actions-run.png"
+         alt="GitHub Actions run for 'MLOps Pipeline' showing data-processing, model-training, and build-and-publish all green"
+         width="850">
   </a>
 </p>
-<sub>Dash panels include Request Rate (per endpoint), p95 Latency, Error Rate, and Request Size. Useful for SLIs/SLOs and autoscaling signals.</sub>
+<sub>End-to-end CI proof: data → train (ephemeral MLflow) → build/test → publish image.</sub>
 
 ### Argo CD — Application Topology
 <p align="center">
@@ -123,6 +146,14 @@ flowchart LR
   </a>
 </p>
 <sub>Frontend for manual testing and demos. Calls FastAPI at <code>/predict</code> and renders price, confidence, range, and top factors.</sub>
+
+### Grafana — API Observability
+<p align="center">
+  <a href="docs/assets/grafana-observability.png">
+    <img src="docs/assets/grafana-observability.png" alt="Grafana dashboard showing request rate per endpoint, 95th percentile latency, error rate, and request size for /health and /predict" width="850">
+  </a>
+</p>
+<sub>Dash panels include Request Rate (per endpoint), p95 Latency, Error Rate, and Request Size. Useful for SLIs/SLOs and autoscaling signals.</sub>
 
 
 ## 📦 Project Structure
@@ -325,9 +356,27 @@ curl -X POST "http://localhost:8000/predict" \
 
 Be sure to replace `http://localhost:8000/predict` with actual endpoint based on where its running. 
 
+## 🧯 Troubleshooting
+
+- **Streamlit cannot hit API:** Wrong `API_URL`. Use `http://fastapi:8000` in Kubernetes.
+- **Ingress 502/504:** Service/port mismatch; probe `/health`; check readinessProbe.
+- **No metrics in Grafana:** ServiceMonitor label selector doesn’t match Service labels; verify `release`/`app` labels.
+- **KEDA not scaling:** Trigger query returns 0; check Prometheus target is “up”; adjust cooldownPeriod/minReplicas.
+- **CI image push fails:** Missing `DOCKERHUB_TOKEN` or wrong `DOCKERHUB_USERNAME` repo permissions.
+- **Container crash loop:** Missing `MODEL_PATH`/`PREPROCESSOR_PATH` or corrupted artifact.
+
+
 ## 🎯 Key Learning Outcomes
 * Applying MLOps best practices in a structured project
 * Using MLflow to track experiments, metrics, and models
 * Packaging and deploying ML services with FastAPI + Streamlit
 * Leveraging Docker Compose for reproducible environments
 * Demonstrating how raw data becomes a production-ready ML application
+
+## Attribution
+
+This project stands on the shoulders of learning materials by **Gourav Shah** (MLOps Bootcamp).  
+It preserves the teaching intent and reframes it as a deployable reference—same ideas, production discipline.  
+All adaptations and mistakes are mine.
+
+
